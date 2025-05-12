@@ -14,127 +14,107 @@ function Navbar() {
   return (
     <nav className="navbar">
       <Link to="/" className="logo">
-        <span role="img" aria-label="helping hands">🙌</span> Disaster Relief Network
+        <i className="fas fa-hands-helping"></i> Disaster Relief Network
       </Link>
-      
+
       <div className="nav-links">
-        <Link to="/volunteer" className="nav-link">
-          <span role="img" aria-label="volunteer">👷</span> Volunteer
+        <Link to="/" className="nav-link">
+          <i className="fas fa-home"></i> Home
         </Link>
-        <Link to="/affected" className="nav-link">
-          <span role="img" aria-label="affected">🆘</span> Affected
+        <Link to="/about" className="nav-link">
+          <i className="fas fa-info-circle"></i> About Us
         </Link>
-        <Link to="/donor" className="nav-link">
-          <span role="img" aria-label="donor">💝</span> Donor
+        <Link to="/services" className="nav-link">
+          <i className="fas fa-concierge-bell"></i> Services
         </Link>
-        
+        <Link to="/contact" className="nav-link">
+          <i className="fas fa-envelope"></i> Contact
+        </Link>
+
         <button onClick={handleLogout} className="logout-button">
-          <span role="img" aria-label="logout">🚪</span> Logout
+          <i className="fas fa-sign-out-alt"></i> Logout
         </button>
       </div>
 
       <style jsx>{`
         .navbar {
-          background: linear-gradient(135deg, #2c3e50, #3498db);
-          color: white;
+          background-color: #ffffff;
+          border-bottom: 2px solid #e6e6e6;
+          color: #333333;
           padding: 1rem 2rem;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          font-family: Arial, sans-serif;
           position: sticky;
           top: 0;
           z-index: 1000;
         }
-        
+
         .logo {
-          color: white;
-          text-decoration: none;
           font-size: 1.4rem;
-          font-weight: 700;
+          font-weight: 600;
+          color: #333333;
+          text-decoration: none;
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          transition: transform 0.3s ease;
         }
-        
-        .logo:hover {
-          transform: scale(1.03);
-        }
-        
+
         .nav-links {
           display: flex;
           align-items: center;
           gap: 1.5rem;
         }
-        
+
         .nav-link {
-          color: white;
+          font-size: 1rem;
+          color: #333333;
           text-decoration: none;
           font-weight: 500;
-          padding: 0.5rem 0;
-          position: relative;
+          padding: 0.4rem 0;
           display: flex;
           align-items: center;
-          gap: 0.4rem;
-          transition: all 0.3s ease;
+          gap: 0.5rem;
+          transition: color 0.3s ease, border-bottom 0.3s ease;
         }
-        
-        .nav-link::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 0;
-          height: 2px;
-          background-color: white;
-          transition: width 0.3s ease;
-        }
-        
-        .nav-link:hover::after {
-          width: 100%;
-        }
-        
+
         .nav-link:hover {
-          transform: translateY(-2px);
+          color: #007bff;
+          border-bottom: 2px solid #007bff;
         }
-        
+
         .logout-button {
-          background: rgba(255, 255, 255, 0.1);
-          color: white;
-          border: 1px solid rgba(255, 255, 255, 0.3);
+          background-color: #f8f9fa;
+          color: #333333;
+          border: 1px solid #dee2e6;
           padding: 0.5rem 1.2rem;
-          border-radius: 25px;
+          border-radius: 5px;
           cursor: pointer;
           font-weight: 500;
           display: flex;
           align-items: center;
           gap: 0.5rem;
           transition: all 0.3s ease;
-          backdrop-filter: blur(5px);
         }
-        
+
         .logout-button:hover {
-          background: rgba(231, 76, 60, 0.8);
-          transform: translateY(-2px);
-          box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+          background-color: #007bff;
+          color: white;
+          border-color: #0056b3;
         }
-        
+
         @media (max-width: 768px) {
           .navbar {
             flex-direction: column;
-            padding: 1rem;
+            padding: 0.8rem;
           }
-          
+
           .nav-links {
-            margin-top: 1rem;
+            margin-top: 0.8rem;
             flex-wrap: wrap;
             justify-content: center;
             gap: 1rem;
-          }
-          
-          .logo {
-            margin-bottom: 0.5rem;
           }
         }
       `}</style>

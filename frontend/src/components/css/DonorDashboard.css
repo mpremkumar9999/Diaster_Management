@@ -58,6 +58,8 @@
     margin-bottom: 2rem;
     height: auto;
     border-top: 3px solid #63b3ed; /* Sky blue accent */
+    display: flex;
+    flex-direction: column; /* To make the header and scrollable area stack */
 }
 
 .card-header {
@@ -164,9 +166,22 @@
     color: #4a5568;
 }
 
+.history-card {
+    display: flex;
+    flex-direction: column; /* Ensure header and scrollable area stack */
+}
+
+.history-table-scrollable {
+    overflow-y: auto; /* Enable vertical scrolling */
+    max-height: 300px; /* Adjust this value as needed */
+    margin-top: 1rem; /* Add some space between header and table */
+}
+
 .history-table {
     display: flex;
     flex-direction: column;
+    border-collapse: collapse; /* For cleaner borders if needed */
+    width: 100%; /* Ensure table takes full width of the scrollable area */
 }
 
 .table-header, .table-row {
@@ -174,12 +189,18 @@
     grid-template-columns: 2fr 1fr 1fr;
     padding: 1rem 0;
     border-bottom: 1px solid #e2e8f0;
+    width: 100%; /* Ensure each row takes full width */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
 }
 
 .table-header {
     font-weight: 600;
     color: #2c5282;
     border-bottom: 2px solid #4299e1;
+    position: sticky; /* Make the header stick to the top of the scrollable area */
+    top: 0;
+    background-color: white; /* Ensure background color for stickiness */
+    z-index: 1; /* Ensure it stays above the content */
 }
 
 .table-row:last-child {

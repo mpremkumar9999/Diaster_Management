@@ -1,28 +1,28 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-  username: { 
-    type: String, 
+  username: {
+    type: String,
     required: true,
     trim: true,
     minlength: 3
   },
-  email: { 
-    type: String, 
-    required: true, 
+  email: {
+    type: String,
+    required: true,
     unique: true,
     trim: true,
     lowercase: true,
     match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
   },
-  password: { 
-    type: String, 
+  password: {
+    type: String,
     required: true,
     minlength: 6
   },
-  role: { 
-    type: String, 
-    enum: ['affected', 'donor', 'volunteer', 'admin'], 
+  role: {
+    type: String,
+    enum: ['affected', 'donor', 'volunteer', 'admin'],
     required: true,
     default: 'affected'
   },
@@ -30,30 +30,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
     enum: [
-      "Alluri Sitharama Raju",
-      "Anakapalli",
-      "Anantapur",
-      "Bapatla",
-      "Chittoor",
-      "Dr. B.R. Ambedkar Konaseema",
-      "East Godavari",
-      "Eluru",
-      "Guntur",
-      "Kadapa",
-      "Kakinada",
-      "Krishna",
-      "Kurnool",
-      "Manyam",
-      "Nandyal",
-      "NTR",
-      "Palnadu",
-      "Prakasam",
-      "Sri Potti Sriramulu Nellore",
-      "Srikakulam",
-      "Tirupati",
-      "Visakhapatnam",
-      "Vizianagaram",
-      "West Godavari"
+      "Alluri Sitharama Raju", "Anakapalli", "Anantapur", "Bapatla", "Chittoor", "Dr. B.R. Ambedkar Konaseema",
+      "East Godavari", "Eluru", "Guntur", "Kadapa", "Kakinada", "Krishna", "Kurnool", "Manyam",
+      "Nandyal", "NTR", "Palnadu", "Prakasam", "Sri Potti Sriramulu Nellore", "Srikakulam",
+      "Tirupati", "Visakhapatnam", "Vizianagaram", "West Godavari"
     ]
   },
   location: {
@@ -67,8 +47,8 @@ const UserSchema = new mongoose.Schema({
       required: true,
       validate: {
         validator: function(v) {
-          return v.length === 2 && 
-                 typeof v[0] === 'number' && 
+          return v.length === 2 &&
+                 typeof v[0] === 'number' &&
                  typeof v[1] === 'number' &&
                  v[0] >= -180 && v[0] <= 180 &&
                  v[1] >= -90 && v[1] <= 90;
@@ -81,7 +61,6 @@ const UserSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Create geospatial index for location field
 UserSchema.index({ location: '2dsphere' });
 
 module.exports = mongoose.model('User', UserSchema);

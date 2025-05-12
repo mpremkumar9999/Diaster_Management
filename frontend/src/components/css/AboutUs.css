@@ -1,0 +1,67 @@
+.about-us-container {
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+  }
+  
+  .about-us-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .about-us-header h1 {
+    font-size: 2.5rem;
+    color: #007bff;
+    margin-bottom: 0.5rem;
+  }
+  
+  .about-us-header p {
+    font-size: 1.1rem;
+    color: #666;
+  }
+  
+  .our-story, .our-values, .our-team {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #eee;
+  }
+  
+  .our-story h2, .our-values h2, .our-team h2 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 0.5rem;
+  }
+  
+  .our-values ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .our-values li {
+    margin-bottom: 0.7rem;
+  }
+  
+  .our-values li strong {
+    font-weight: bold;
+    color: #007bff;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .about-us-header h1 {
+      font-size: 2rem;
+    }
+  
+    .our-story, .our-values, .our-team {
+      padding: 1rem;
+    }
+  
+    .our-story h2, .our-values h2, .our-team h2 {
+      font-size: 1.5rem;
+    }
+  }

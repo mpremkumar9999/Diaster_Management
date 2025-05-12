@@ -1,62 +1,153 @@
-// src/components/AffectedDashboard.js
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import { useAuth } from '../contexts/AuthContext';
+import api from '../services/api';
+import './css/AffectedDashboard.css';
 
 function AffectedDashboard() {
+  const { user } = useAuth();
+  const [requests, setRequests] = useState([]);
+  const [formData, setFormData] = useState({
+    type: 'food',
+    description: '',
+    urgency: 'medium',
+    quantity: 1
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  const fetchRequests = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/api/requests/history');
+      setRequests(response.data);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to load requests');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setError('');
+      await api.post('/api/requests', formData);
+      setFormData({ type: 'food', description: '', urgency: 'medium', quantity: 1 });
+      fetchRequests();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to submit request');
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'quantity' ? parseInt(value) || 1 : value
+    }));
+  };
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f4faff' }}>
+    <div className="dashboard-container">
       <Navbar />
-      <div style={{ 
-        flex: 1, 
-        fontFamily: 'Arial, sans-serif', 
-        padding: '20px', 
-        backgroundColor: '#ffffff', 
-        borderRadius: '8px', 
-        margin: '20px', 
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' 
-      }}>
-        <h2 style={{ 
-          color: '#1b3a57', 
-          marginBottom: '20px', 
-          borderBottom: '2px solid #63b3ed', 
-          paddingBottom: '10px' 
-        }}>
-          Affected Dashboard
-        </h2>
-        <div style={{ 
-          backgroundColor: '#e6f2ff', 
-          padding: '20px', 
-          borderRadius: '8px', 
-          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)', 
-          marginBottom: '20px' 
-        }}>
-          <h3 style={{ 
-            marginBottom: '15px', 
-            color: '#0f62fe', 
-            fontWeight: '600' 
-          }}>
-            Your Needs
-          </h3>
-          <p style={{ color: '#333' }}>Food: <span style={{ fontWeight: 'bold' }}>Requested</span></p>
-          <p style={{ color: '#333' }}>Shelter: <span style={{ fontWeight: 'bold' }}>Provided</span></p>
-          <p style={{ color: '#333' }}>Medical Aid: <span style={{ fontWeight: 'bold' }}>Pending</span></p>
-        </div>
-        <div style={{ 
-          backgroundColor: '#f0f9ff', 
-          padding: '20px', 
-          borderRadius: '8px', 
-          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)' 
-        }}>
-          <h3 style={{ 
-            marginBottom: '15px', 
-            color: '#007bff', 
-            fontWeight: '600' 
-          }}>
-            Available Resources
-          </h3>
-          <p style={{ color: '#333' }}>Nearest Shelter: <span style={{ fontWeight: 'bold' }}>Community Center</span></p>
-          <p style={{ color: '#333' }}>Food Distribution: <span style={{ fontWeight: 'bold' }}>City Hall</span></p>
+      <div className="dashboard-content">
+        <header className="dashboard-header">
+          <h1>Affected Dashboard</h1>
+          <p className="subtitle">Request the help you need. We are here for you.</p>
+        </header>
+
+        <div className="dashboard-main">
+          {/* Left Section - Request Form */}
+          <div className="dashboard-section left-section">
+            <div className="card request-form">
+              <div className="card-header">
+                <h2><span role="img" aria-label="help">🆘</span> New Relief Request</h2>
+              </div>
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label>Type:</label>
+                  <select name="type" value={formData.type} onChange={handleChange}>
+                    <option value="food">🍲 Food</option>
+                    <option value="clothing">👕 Clothing</option>
+                    <option value="medical">🩹 Medical</option>
+                    <option value="other">📦 Other</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Quantity:</label>
+                  <input
+                    type="number"
+                    name="quantity"
+                    min="1"
+                    value={formData.quantity}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Urgency:</label>
+                  <select name="urgency" value={formData.urgency} onChange={handleChange}>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Description:</label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <button type="submit" className="submit-button" disabled={loading}>
+                  {loading ? 'Submitting...' : 'Submit Request'}
+                </button>
+
+                {error && <div className="error-message">{error}</div>}
+              </form>
+            </div>
+          </div>
+
+          {/* Right Section - Request History */}
+          <div className="dashboard-section right-section">
+            <div className="card history-card">
+              <div className="card-header">
+                <h2><span role="img" aria-label="history">📋</span> Request History</h2>
+              </div>
+              <div className="history-table">
+                <div className="table-header">
+                  <span>Type</span>
+                  <span>Quantity</span>
+                  <span>Urgency</span>
+                  <span>Date</span>
+                </div>
+                {requests.map((request) => (
+                  <div className="table-row" key={request._id}>
+                    <span>{request.type.charAt(0).toUpperCase() + request.type.slice(1)}</span>
+                    <span>{request.quantity}</span>
+                    <span>{request.urgency}</span>
+                    <span>{new Date(request.createdAt).toLocaleDateString()}</span>
+                  </div>
+                ))}
+                {requests.length === 0 && (
+                  <div className="table-row">
+                    <span colSpan="4">No requests submitted yet.</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <Footer />

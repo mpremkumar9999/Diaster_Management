@@ -3,29 +3,34 @@ import { AuthContext } from "../contexts/AuthContext";
 import DashboardLayout from './DashboardLayout';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
-import './css/AdminDashboard.css';  // Import the CSS file
+import './css/AdminDashboard.css';
 
 const AdminDashboard = () => {
     const { token, user } = useContext(AuthContext);
     const navigate = useNavigate();
     const apiKey = "2d4af8986ab10d395f483e387301f009";
     const districts = [
-        "Anantapur", "Chittoor", "East Godavari", "Guntur", "Kadapa", "Krishna", 
-        "Kurnool", "Nellore", "West Godavari", "Prakasam", "Srikakulam", 
-        "Visakhapatnam", "Vizianagaram", "Rayalaseema", "Amaravati", 
+        "Anantapur", "Chittoor", "East Godavari", "Guntur", "Kadapa", "Krishna",
+        "Kurnool", "Nellore", "West Godavari", "Prakasam", "Srikakulam",
+        "Visakhapatnam", "Vizianagaram", "Rayalaseema", "Amaravati",
         "Vijayawada", "Tirupati", "Nandyal"
     ];
 
     const [selectedDistrict, setSelectedDistrict] = useState(districts[0]);
     const [weatherData, setWeatherData] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [loadingWeather, setLoadingWeather] = useState(false);
+    const [errorWeather, setErrorWeather] = useState(null);
     const [alertMessage, setAlertMessage] = useState("");
     const [alertSentStatus, setAlertSentStatus] = useState(null);
+    const [users, setUsers] = useState([]);
+    const [loadingUsers, setLoadingUsers] = useState(false);
+    const [errorUsers, setErrorUsers] = useState(null);
 
     useEffect(() => {
         if (!token || user?.role !== 'admin') {
             navigate('/login');
+        } else {
+            fetchUsers();
         }
     }, [token, user, navigate]);
 
@@ -36,8 +41,8 @@ const AdminDashboard = () => {
     }, [selectedDistrict]);
 
     const fetchWeatherData = async (district) => {
-        setLoading(true);
-        setError(null);
+        setLoadingWeather(true);
+        setErrorWeather(null);
         try {
             const response = await fetch(
                 `https://api.openweathermap.org/data/2.5/weather?q=${district},IN&appid=${apiKey}&units=metric`
@@ -53,10 +58,10 @@ const AdminDashboard = () => {
                 district: district,
             });
         } catch (err) {
-            setError("Failed to fetch weather data");
+            setErrorWeather("Failed to fetch weather data");
             console.error(err);
         } finally {
-            setLoading(false);
+            setLoadingWeather(false);
         }
     };
 
@@ -68,7 +73,7 @@ const AdminDashboard = () => {
 
         try {
             setAlertSentStatus({ success: null, message: "Sending alert..." });
-            await api.post('/alerts/send-district', {
+            await api.post('/api/alerts/send-district', {
                 district: selectedDistrict,
                 message: alertMessage,
             }, {
@@ -82,6 +87,24 @@ const AdminDashboard = () => {
         }
     };
 
+    const fetchUsers = async () => {
+        setLoadingUsers(true);
+        setErrorUsers(null);
+        try {
+            const response = await api.get('/api/users', {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setUsers(response.data);
+        } catch (error) {
+            console.error("Fetch users error:", error.response?.data || error.message);
+            setErrorUsers("Failed to fetch user data");
+            
+            console.error(error);
+        } finally {
+            setLoadingUsers(false);
+        }
+    };
+
     return (
         <DashboardLayout>
             <div className="admin-dashboard">
@@ -89,9 +112,9 @@ const AdminDashboard = () => {
                 <header className="dashboard-header">
                     <div className="header-content">
                         <div className="logo-container">
-                            <img 
-                                src="https://www.example.com/logo.png" 
-                                alt="AP Logo" 
+                            <img
+                                src="https://upload.wikimedia.org/wikipedia/commons/3/37/Emblem_of_Andhra_Pradesh.svg"
+                                alt="AP Logo"
                                 className="logo"
                             />
                             <h1>Andhra Pradesh Disaster Management</h1>
@@ -106,6 +129,7 @@ const AdminDashboard = () => {
                 {/* Main Content */}
                 <main className="dashboard-content">
                     <section className="weather-section">
+                        <h2>Weather Information</h2>
                         <div className="district-selector">
                             <label htmlFor="district-select">Select District:</label>
                             <select
@@ -120,16 +144,16 @@ const AdminDashboard = () => {
                             </select>
                         </div>
 
-                        {loading && <div className="loading-spinner"></div>}
-                        {error && <div className="error-message">{error}</div>}
+                        {loadingWeather && <div className="loading-spinner"></div>}
+                        {errorWeather && <div className="error-message">{errorWeather}</div>}
 
                         {weatherData && (
                             <div className="weather-card">
                                 <div className="weather-header">
-                                    <h2>{weatherData.district}</h2>
-                                    <img 
-                                        src={`http://openweathermap.org/img/wn/${weatherData.iconCode}@2x.png`} 
-                                        alt="Weather icon" 
+                                    <h3>{weatherData.district}</h3>
+                                    <img
+                                        src={`http://openweathermap.org/img/wn/${weatherData.iconCode}@2x.png`}
+                                        alt="Weather icon"
                                         className="weather-icon"
                                     />
                                 </div>
@@ -175,7 +199,7 @@ const AdminDashboard = () => {
                                 onChange={(e) => setAlertMessage(e.target.value)}
                                 rows="4"
                             />
-                            <button 
+                            <button
                                 className="alert-button"
                                 onClick={handleSendAlert}
                                 disabled={!alertMessage.trim()}
@@ -188,6 +212,43 @@ const AdminDashboard = () => {
                                 </div>
                             )}
                         </div>
+                    </section>
+
+                    {/* User Management Section */}
+                    <section className="user-management-section">
+                        <h2>User Management</h2>
+
+                        {loadingUsers && <div className="loading-spinner"></div>}
+                        {errorUsers && <div className="error-message">{errorUsers}</div>}
+
+                        {users.length > 0 && (
+                            <div className="user-table-container">
+                                <table className="user-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Username</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th>District</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {users.map(user => (
+                                            <tr key={user._id}>
+                                                <td>{user.username}</td>
+                                                <td>{user.email}</td>
+                                                <td>{user.role}</td>
+                                                <td>{user.district}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+
+                        {users.length === 0 && !loadingUsers && !errorUsers && (
+                            <div className="no-data-message">No users found.</div>
+                        )}
                     </section>
                 </main>
 

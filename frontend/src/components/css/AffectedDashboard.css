@@ -1,0 +1,62 @@
+.dashboard-content {
+    padding: 2rem;
+  }
+  
+  .dashboard-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .card {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+  }
+  
+  .card-header {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+  }
+  
+  .submit-button {
+    padding: 0.6rem 1.2rem;
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .history-table {
+    margin-top: 1rem;
+  }
+  
+  .table-header, .table-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .error-message {
+    color: red;
+    margin-top: 1rem;
+  }
+  

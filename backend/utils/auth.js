@@ -1,24 +1,42 @@
-// backend/utils/auth.js
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
-module.exports = function (req, res, next) {
-  const token = req.header('Authorization'); // Use Authorization header
-  console.log("Backend Middleware: Received Authorization header:", token);
+module.exports = async function (req, res, next) {
+  const authHeader = req.header('Authorization');
+  console.log("Auth Middleware: Received Authorization header:", authHeader);
 
-  if (!token) {
-    console.log("Backend Middleware: No token found");
+  if (!authHeader) {
+    console.log("Auth Middleware: No token found");
     return res.status(401).json({ msg: 'No token, authorization denied' });
   }
 
   try {
-    const tokenString = token.replace('Bearer ', ''); // Remove 'Bearer ' if present
-    console.log("Backend Middleware: Token after removing 'Bearer ':", tokenString);
-    const decoded = jwt.verify(tokenString, process.env.JWT_SECRET);
-    console.log("Backend Middleware: Token decoded successfully:", decoded);
-    req.user = decoded.user;
+    const token = authHeader.replace('Bearer ', '');
+    console.log("Auth Middleware: Token after removing 'Bearer ':", token);
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Auth Middleware: Token decoded successfully:", decoded);
+
+    // Fetch full user from DB to get role and more
+    const user = await User.findById(decoded.user.id).select('-password');
+
+    if (!user) {
+      return res.status(401).json({ msg: 'User not found' });
+    }
+
+   req.user = {
+      id: user._id,
+      role: user.role,
+      email: user.email,
+      username: user.username,
+      district: user.district  // ✅ Add this line
+    };
+    
+
+    console.log("Auth Middleware: Final user attached to req.user:", req.user);
     next();
   } catch (err) {
-    console.error("Backend Middleware: Token verification error:", err);
+    console.error("Auth Middleware: Token verification error:", err.message);
     res.status(401).json({ msg: 'Token is not valid' });
   }
 };

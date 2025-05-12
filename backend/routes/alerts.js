@@ -103,4 +103,90 @@ router.get('/user-alerts', auth, async (req, res) => {
     }
 });
 
-module.exports = router;
+// ✅ Volunteer-specific email alerts function
+async function sendVolunteerAlerts(district, message) {
+    console.log(`⏳ Starting to send volunteer alerts for ${district}...`);
+
+    try {
+        // Find volunteers in the given district
+        const volunteers = await User.find({
+            district,
+            role: 'volunteer' // Make sure this field exists in User schema
+        });
+
+        if (!volunteers || volunteers.length === 0) {
+            console.log(`⚠️ No volunteers found in district: ${district}`);
+            return {
+                success: false,
+                message: `No volunteers found in ${district}`,
+                sent: [],
+                failed: []
+            };
+        }
+
+        const sentEmails = [];
+        const failedEmails = [];
+
+        for (const volunteer of volunteers) {
+            if (volunteer.email) {
+                const mailOptions = {
+                    from: process.env.EMAIL_USER,
+                    to: volunteer.email,
+                    subject: `Volunteer Alert for ${district}`,
+                    text: `Dear ${volunteer.username},\n\nVolunteer action required:\n\n${message}\n\nPlease respond as soon as possible.\n\nSincerely,\nThe Andhra Pradesh Weather Team`,
+                };
+
+                console.log(`⏳ Sending volunteer email to ${volunteer.username} <${volunteer.email}>...`);
+
+                try {
+                    const info = await transporter.sendMail(mailOptions);
+                    console.log(`✅ Volunteer email sent to ${volunteer.email}: ${info.messageId}`);
+                    sentEmails.push({
+                        email: volunteer.email,
+                        username: volunteer.username,
+                        userId: volunteer._id
+                    });
+                } catch (error) {
+                    console.error(`❌ Error sending volunteer email to ${volunteer.email}:`, error.message);
+                    failedEmails.push({
+                        email: volunteer.email,
+                        username: volunteer.username,
+                        error: error.message
+                    });
+                }
+            } else {
+                console.warn(`⚠️ Volunteer ${volunteer.username} has no email address.`);
+            }
+        }
+
+        const result = {
+            success: true,
+            message: `Volunteer alerts sent to ${sentEmails.length} volunteers in ${district}`,
+            sent: sentEmails,
+            failed: failedEmails
+        };
+
+        if (failedEmails.length > 0) {
+            result.success = false;
+            result.message += ` with ${failedEmails.length} failures`;
+        }
+
+        return result;
+
+    } catch (error) {
+        console.error('🚨 Error in sendVolunteerAlerts function:', error);
+        return {
+            success: false,
+            message: 'Failed to send volunteer alerts',
+            error: error.message,
+            sent: [],
+            failed: []
+        };
+    }
+}
+
+// 👇 Export both router and the alert function
+module.exports = {
+    router,
+    sendVolunteerAlerts
+};

@@ -16,7 +16,7 @@ function LoginPage() {
     e.preventDefault();
     setError('');
     try {
-      const response = await api.post('/users/login', { username, password });
+      const response = await api.post('/api/users/login', { username, password });
       const responseData = response.data;
 
       if (responseData.token && responseData.user) {

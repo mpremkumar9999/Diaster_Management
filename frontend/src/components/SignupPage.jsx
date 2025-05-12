@@ -61,7 +61,7 @@ function SignupPage() {
         coordinates: selectedDistrict.coordinates
       } : null;
 
-      const response = await api.post('/users/signup', {
+      const response = await api.post('/api/users/signup', {
         ...formData,
         location
       });
